@@ -10,8 +10,14 @@ export class AgentsService {
   constructor(
     @InjectRepository(Agent) private agentRepository: Repository<Agent>,
   ) {}
-  createAgent(createAgentDto: CreateAgentDto) {
-    const newAgent = this.agentRepository.create(createAgentDto);
-    return this.agentRepository.save(newAgent);
+  async createAgent(createAgentDto: CreateAgentDto) {
+    // const agent = new Agent();
+    // await agent.hashPassword();
+    // createAgentDto.password = agent.password;
+    // const newAgent = this.agentRepository.create(createAgentDto);
+    // return this.agentRepository.save(newAgent);
+
+    console.log('createagentData2:', createAgentDto);
+    console.log(this.agentRepository);
   }
 }

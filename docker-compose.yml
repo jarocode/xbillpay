@@ -1,10 +1,10 @@
 services:
   api_gateway:
-    build: ./xbillpay-server
+    build: ./xbillpay-gateway
     ports:
       - "3000:3000"
     volumes:
-      - ./xbillpay-server/src:/usr/src/app/src
+      - ./xbillpay-gateway/src:/usr/src/app/src
     command: npm run start:dev
     environment:
       - PORT=3000

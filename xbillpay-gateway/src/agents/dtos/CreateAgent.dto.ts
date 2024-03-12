@@ -10,4 +10,7 @@ export class CreateAgentDto {
 
   @IsString()
   phone_number: string;
+
+  @IsString()
+  password: string;
 }

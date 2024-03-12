@@ -9,12 +9,12 @@ export class AgentsController {
 
   @Get()
   getAgent() {
-    return 'hello world';
+    return 'hello Nest!';
   }
 
   @Post()
   createAgent(@Body() createAgentDto: CreateAgentDto) {
-    console.log(createAgentDto);
+    // console.log(createAgentDto);
     return this.natsClient.send({ cmd: 'createAgent' }, createAgentDto);
   }
 }

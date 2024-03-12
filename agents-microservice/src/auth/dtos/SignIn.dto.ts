@@ -1,9 +1,7 @@
-export class CreateAgentDto {
+export class SignInDto {
   username: string;
 
   email: string;
-
-  phone_number: string;
 
   password: string;
 }

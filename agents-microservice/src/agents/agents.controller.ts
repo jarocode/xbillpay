@@ -9,7 +9,10 @@ export class AgentsMicroServiceController {
   @MessagePattern({ cmd: 'createAgent' })
   createAgent(@Payload() data: CreateAgentDto) {
     this.agentsService.createAgent(data);
-    console.log(data);
-    return data;
+    return {
+      message: 'Agent account created successfully!',
+      data,
+      status: 'success',
+    };
   }
 }
