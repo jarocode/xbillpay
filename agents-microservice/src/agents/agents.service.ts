@@ -1,9 +1,11 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 import { Agent } from 'src/typeorm/entities/Agent';
 import { CreateAgentDto } from './dtos/CreateAgent.dto';
+import { SignInDto } from 'src/auth/dtos/SignIn.dto';
 
 @Injectable()
 export class AgentsService {
@@ -11,13 +13,24 @@ export class AgentsService {
     @InjectRepository(Agent) private agentRepository: Repository<Agent>,
   ) {}
   async createAgent(createAgentDto: CreateAgentDto) {
-    // const agent = new Agent();
-    // await agent.hashPassword();
-    // createAgentDto.password = agent.password;
-    // const newAgent = this.agentRepository.create(createAgentDto);
-    // return this.agentRepository.save(newAgent);
+    try {
+      const { password } = createAgentDto;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      createAgentDto.password = hashedPassword;
+      const newAgent = this.agentRepository.create(createAgentDto);
+      console.log('newAgent', newAgent);
+      console.log('createAgentDto', createAgentDto);
+      return this.agentRepository.save(newAgent);
+    } catch (error) {
+      console.error('error:', error);
+    }
+  }
 
-    console.log('createagentData2:', createAgentDto);
-    console.log(this.agentRepository);
+  async signInAgent(signInDto: SignInDto) {
+    try {
+      console.log(signInDto);
+    } catch (error) {
+      console.error('error:', error);
+    }
   }
 }

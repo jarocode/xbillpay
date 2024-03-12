@@ -8,11 +8,20 @@ export class AgentsMicroServiceController {
   constructor(private agentsService: AgentsService) {}
   @MessagePattern({ cmd: 'createAgent' })
   createAgent(@Payload() data: CreateAgentDto) {
-    this.agentsService.createAgent(data);
-    return {
-      message: 'Agent account created successfully!',
-      data,
-      status: 'success',
-    };
+    try {
+      this.agentsService.createAgent(data);
+      return {
+        message: 'Agent account created successfully!',
+        data,
+        status: 'success',
+      };
+    } catch (error) {
+      console.error('error', error);
+      return {
+        message: error,
+        data: null,
+        status: 'failed',
+      };
+    }
   }
 }

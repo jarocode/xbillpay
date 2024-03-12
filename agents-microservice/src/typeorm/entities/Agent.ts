@@ -2,10 +2,9 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  BeforeInsert,
-  BeforeUpdate,
+  // BeforeInsert,
+  // BeforeUpdate,
 } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 
 @Entity({ name: 'agents' })
 export class Agent {
@@ -16,16 +15,19 @@ export class Agent {
   username: string;
 
   @Column({ nullable: false })
+  email: string;
+
+  @Column({ nullable: false })
   phone_number: string;
 
   @Column({ nullable: false, select: false })
   password: string;
 
-  @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword() {
-    if (this.password) {
-      this.password = await bcrypt.hash(this.password, 10); // Adjust rounds as needed
-    }
-  }
+  // @BeforeInsert()
+  // @BeforeUpdate()
+  // async hashPassword() {
+  //   if (this.password) {
+  //     this.password = await bcrypt.hash(this.password, 10); // Adjust rounds as needed
+  //   }
+  // }
 }
