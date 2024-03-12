@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { Agent } from 'src/typeorm/entities/Agent';
+import { AuthService } from 'src/auth/auth.service';
 import { CreateAgentDto } from './dtos/CreateAgent.dto';
 import { SignInDto } from 'src/auth/dtos/SignIn.dto';
 
@@ -11,6 +12,7 @@ import { SignInDto } from 'src/auth/dtos/SignIn.dto';
 export class AgentsService {
   constructor(
     @InjectRepository(Agent) private agentRepository: Repository<Agent>,
+    private authService: AuthService,
   ) {}
   async createAgent(createAgentDto: CreateAgentDto) {
     try {
@@ -28,7 +30,9 @@ export class AgentsService {
 
   async signInAgent(signInDto: SignInDto) {
     try {
-      console.log(signInDto);
+      console.log('signInDto', signInDto);
+      const token = await this.authService.generateJwtToken(signInDto);
+      console.log('token', token);
     } catch (error) {
       console.error('error:', error);
     }
