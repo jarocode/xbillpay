@@ -14,21 +14,14 @@ export class AgentsService {
     @InjectRepository(Agent) private agentRepository: Repository<Agent>,
     private authService: AuthService,
   ) {}
-  async createAgent(createAgentDto: CreateAgentDto): Promise<Agent> {
-    try {
-      const agent = await this.findAgent(createAgentDto.email);
-      if (agent) {
-        throw new BadRequestException('email already exists');
-      }
-      console.log('code continued');
-      const { password } = createAgentDto;
-      const hashedPassword = await bcrypt.hash(password, 10);
-      createAgentDto.password = hashedPassword;
-      const newAgent = this.agentRepository.create(createAgentDto);
-      return this.agentRepository.save(newAgent);
-    } catch (error) {
-      console.error('error:', error);
-    }
+  async createAgent(createAgentDto: CreateAgentDto) {
+    const agent = await this.findAgent(createAgentDto.email);
+    if (agent) throw new BadRequestException('email already exists');
+    const { password } = createAgentDto;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    createAgentDto.password = hashedPassword;
+    const newAgent = this.agentRepository.create(createAgentDto);
+    return this.agentRepository.save(newAgent);
   }
 
   async findAgent(email: string): Promise<Agent> {
@@ -36,25 +29,20 @@ export class AgentsService {
   }
 
   async signInAgent(signInDto: SignInDto) {
-    try {
-      const agent = await this.findAgent(signInDto.email);
-      if (!agent) {
-        throw new BadRequestException('this agent does not exist!');
-      }
-      const isPasswordValid = bcrypt.compareSync(
-        signInDto.password,
-        agent.password,
-      );
-
-      if (!isPasswordValid) {
-        throw new BadRequestException('password is invalid');
-      }
-      const token = await this.authService.generateJwtToken(signInDto);
-      console.log('token', token);
-      const data = { ...token, ...agent };
-      return data;
-    } catch (error) {
-      console.error('error:', error);
+    const agent = await this.findAgent(signInDto.email);
+    if (!agent) {
+      throw new BadRequestException('this agent does not exist!');
     }
+    const isPasswordValid = bcrypt.compareSync(
+      signInDto.password,
+      agent.password,
+    );
+
+    if (!isPasswordValid) throw new BadRequestException('password is invalid');
+
+    const token = await this.authService.generateJwtToken(signInDto);
+    console.log('token', token);
+    const data = { ...token, ...agent };
+    return data;
   }
 }

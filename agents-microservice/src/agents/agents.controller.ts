@@ -1,4 +1,4 @@
-import { Controller, BadRequestException } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
 import { CreateAgentDto } from './dtos/CreateAgent.dto';
@@ -9,9 +9,9 @@ import { SignInDto } from 'src/auth/dtos/SignIn.dto';
 export class AgentsMicroServiceController {
   constructor(private agentsService: AgentsService) {}
   @MessagePattern({ cmd: 'createAgent' })
-  createAgent(@Payload() data: CreateAgentDto) {
+  async createAgent(@Payload() data: CreateAgentDto) {
     try {
-      this.agentsService.createAgent(data);
+      await this.agentsService.createAgent(data);
 
       return {
         message: 'Agent account created successfully!',
@@ -20,20 +20,14 @@ export class AgentsMicroServiceController {
       };
     } catch (error) {
       console.error('error', error);
-      if (error instanceof BadRequestException) {
-        throw error; // Re-throw for NestJS handling
-      }
-      return {
-        message: error,
-        data: null,
-        status: 'failed',
-      };
+      throw error;
     }
   }
   @MessagePattern({ cmd: 'signinAgent' })
   async signinAgent(@Payload() data: SignInDto) {
     try {
       const agentDataWithToken = await this.agentsService.signInAgent(data);
+
       return {
         message: 'you have been signed in  successfully!',
         data: agentDataWithToken,
@@ -41,14 +35,7 @@ export class AgentsMicroServiceController {
       };
     } catch (error) {
       console.error('error', error);
-      if (error instanceof BadRequestException) {
-        throw error; // Re-throw for NestJS handling
-      }
-      return {
-        message: error,
-        data: null,
-        status: 'failed',
-      };
+      throw error;
     }
   }
 }
