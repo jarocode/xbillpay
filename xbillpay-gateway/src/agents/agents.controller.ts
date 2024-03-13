@@ -21,7 +21,7 @@ export class AgentsController {
     return 'hello Nest!';
   }
 
-  @Post('creatAccount')
+  @Post('createAccount')
   createAgent(@Body() createAgentDto: CreateAgentDto) {
     // console.log(createAgentDto);
     return this.natsClient.send({ cmd: 'createAgent' }, createAgentDto);

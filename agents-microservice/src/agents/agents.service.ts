@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { Agent } from 'src/typeorm/entities/Agent';
@@ -14,45 +14,47 @@ export class AgentsService {
     @InjectRepository(Agent) private agentRepository: Repository<Agent>,
     private authService: AuthService,
   ) {}
-  async createAgent(createAgentDto: CreateAgentDto) {
+  async createAgent(createAgentDto: CreateAgentDto): Promise<Agent> {
     try {
+      const agent = await this.findAgent(createAgentDto.email);
+      if (agent) {
+        throw new BadRequestException('email already exists');
+      }
+      console.log('code continued');
       const { password } = createAgentDto;
       const hashedPassword = await bcrypt.hash(password, 10);
       createAgentDto.password = hashedPassword;
       const newAgent = this.agentRepository.create(createAgentDto);
-      this.agentRepository.save(newAgent);
-      return {
-        message: 'Agent account created successfully!',
-        data: createAgentDto,
-        status: 'success',
-      };
+      return this.agentRepository.save(newAgent);
     } catch (error) {
       console.error('error:', error);
-      return {
-        message: error,
-        data: null,
-        status: 'failed',
-      };
     }
+  }
+
+  async findAgent(email: string): Promise<Agent> {
+    return this.agentRepository.findOneBy({ email });
   }
 
   async signInAgent(signInDto: SignInDto) {
     try {
+      const agent = await this.findAgent(signInDto.email);
+      if (!agent) {
+        throw new BadRequestException('this agent does not exist!');
+      }
+      const isPasswordValid = bcrypt.compareSync(
+        signInDto.password,
+        agent.password,
+      );
+
+      if (!isPasswordValid) {
+        throw new BadRequestException('password is invalid');
+      }
       const token = await this.authService.generateJwtToken(signInDto);
       console.log('token', token);
-      const data = { ...token, ...signInDto };
-      return {
-        message: 'you have been signed in  successfully!',
-        data,
-        status: 'success',
-      };
+      const data = { ...token, ...agent };
+      return data;
     } catch (error) {
       console.error('error:', error);
-      return {
-        message: error,
-        data: null,
-        status: 'failed',
-      };
     }
   }
 }
