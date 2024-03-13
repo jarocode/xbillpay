@@ -20,21 +20,39 @@ export class AgentsService {
       const hashedPassword = await bcrypt.hash(password, 10);
       createAgentDto.password = hashedPassword;
       const newAgent = this.agentRepository.create(createAgentDto);
-      console.log('newAgent', newAgent);
-      console.log('createAgentDto', createAgentDto);
-      return this.agentRepository.save(newAgent);
+      this.agentRepository.save(newAgent);
+      return {
+        message: 'Agent account created successfully!',
+        data: createAgentDto,
+        status: 'success',
+      };
     } catch (error) {
       console.error('error:', error);
+      return {
+        message: error,
+        data: null,
+        status: 'failed',
+      };
     }
   }
 
   async signInAgent(signInDto: SignInDto) {
     try {
-      console.log('signInDto', signInDto);
       const token = await this.authService.generateJwtToken(signInDto);
       console.log('token', token);
+      const data = { ...token, ...signInDto };
+      return {
+        message: 'you have been signed in  successfully!',
+        data,
+        status: 'success',
+      };
     } catch (error) {
       console.error('error:', error);
+      return {
+        message: error,
+        data: null,
+        status: 'failed',
+      };
     }
   }
 }
