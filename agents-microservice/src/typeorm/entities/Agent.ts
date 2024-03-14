@@ -20,7 +20,8 @@ export class Agent {
   @Column({ nullable: false })
   phone_number: string;
 
-  @Column({ nullable: false, select: false })
+  // @Column({ nullable: false, select: false })
+  @Column({ nullable: false })
   password: string;
 
   // @BeforeInsert()

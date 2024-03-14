@@ -14,7 +14,7 @@ export class AgentsService {
     @InjectRepository(Agent) private agentRepository: Repository<Agent>,
     private authService: AuthService,
   ) {}
-  async createAgent(createAgentDto: CreateAgentDto) {
+  async createAgent(createAgentDto: CreateAgentDto): Promise<Agent> {
     const agent = await this.findAgent(createAgentDto.email);
     if (agent) throw new BadRequestException('email already exists');
     const { password } = createAgentDto;
@@ -30,10 +30,13 @@ export class AgentsService {
 
   async signInAgent(signInDto: SignInDto) {
     const agent = await this.findAgent(signInDto.email);
+    console.log('signInDto', signInDto);
+    console.log('agent', agent);
     if (!agent) {
       throw new BadRequestException('this agent does not exist!');
     }
-    const isPasswordValid = bcrypt.compareSync(
+    console.log(signInDto.password, agent.password);
+    const isPasswordValid = await bcrypt.compare(
       signInDto.password,
       agent.password,
     );
@@ -42,6 +45,7 @@ export class AgentsService {
 
     const token = await this.authService.generateJwtToken(signInDto);
     console.log('token', token);
+    delete agent.password;
     const data = { ...token, ...agent };
     return data;
   }
