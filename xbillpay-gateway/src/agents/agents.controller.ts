@@ -23,8 +23,8 @@ export class AgentsController {
 
   @Post('createAccount')
   createAgent(@Body() createAgentDto: CreateAgentDto) {
-    // console.log(createAgentDto);
     try {
+      console.log('creatDto-gateway', createAgentDto);
       return this.natsClient.send({ cmd: 'createAgent' }, createAgentDto);
     } catch (error) {
       throw error;

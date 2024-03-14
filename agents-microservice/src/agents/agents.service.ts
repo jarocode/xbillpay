@@ -15,12 +15,21 @@ export class AgentsService {
     private authService: AuthService,
   ) {}
   async createAgent(createAgentDto: CreateAgentDto): Promise<Agent> {
+    console.log('begin agent service');
+
     const agent = await this.findAgent(createAgentDto.email);
     if (agent) throw new BadRequestException('email already exists');
+
     const { password } = createAgentDto;
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    console.log('password hashed:', hashedPassword);
+
     createAgentDto.password = hashedPassword;
     const newAgent = this.agentRepository.create(createAgentDto);
+
+    console.log('new agent created');
+
     return this.agentRepository.save(newAgent);
   }
 

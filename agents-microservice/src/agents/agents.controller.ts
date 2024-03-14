@@ -11,6 +11,7 @@ export class AgentsMicroServiceController {
   @MessagePattern({ cmd: 'createAgent' })
   async createAgent(@Payload() data: CreateAgentDto) {
     try {
+      console.log('begin create controller');
       await this.agentsService.createAgent(data);
 
       return {
