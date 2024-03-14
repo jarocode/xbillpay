@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, BadRequestException } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
 import { CreateAgentDto } from './dtos/CreateAgent.dto';
@@ -11,7 +11,6 @@ export class AgentsMicroServiceController {
   @MessagePattern({ cmd: 'createAgent' })
   async createAgent(@Payload() data: CreateAgentDto) {
     try {
-      console.log('begin create controller');
       await this.agentsService.createAgent(data);
 
       return {
@@ -20,7 +19,11 @@ export class AgentsMicroServiceController {
         status: 'success',
       };
     } catch (error) {
-      console.error('error', error);
+      if (error instanceof BadRequestException) {
+        console.log('bad request error:', error?.getResponse());
+        const errorResponse = error.getResponse();
+        return errorResponse;
+      }
       throw error;
     }
   }
@@ -35,7 +38,11 @@ export class AgentsMicroServiceController {
         status: 'success',
       };
     } catch (error) {
-      console.error('error', error);
+      if (error instanceof BadRequestException) {
+        console.log('bad request error:', error?.getResponse());
+        const errorResponse = error.getResponse();
+        return errorResponse;
+      }
       throw error;
     }
   }

@@ -15,20 +15,14 @@ export class AgentsService {
     private authService: AuthService,
   ) {}
   async createAgent(createAgentDto: CreateAgentDto): Promise<Agent> {
-    console.log('begin agent service');
-
     const agent = await this.findAgent(createAgentDto.email);
     if (agent) throw new BadRequestException('email already exists');
 
     const { password } = createAgentDto;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log('password hashed:', hashedPassword);
-
     createAgentDto.password = hashedPassword;
     const newAgent = this.agentRepository.create(createAgentDto);
-
-    console.log('new agent created');
 
     return this.agentRepository.save(newAgent);
   }
@@ -44,7 +38,7 @@ export class AgentsService {
     if (!agent) {
       throw new BadRequestException('this agent does not exist!');
     }
-    console.log(signInDto.password, agent.password);
+
     const isPasswordValid = await bcrypt.compare(
       signInDto.password,
       agent.password,
@@ -53,7 +47,7 @@ export class AgentsService {
     if (!isPasswordValid) throw new BadRequestException('password is invalid');
 
     const token = await this.authService.generateJwtToken(signInDto);
-    console.log('token', token);
+
     delete agent.password;
     const data = { ...token, ...agent };
     return data;
