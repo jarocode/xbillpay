@@ -24,7 +24,8 @@ export class AgentsService {
     createAgentDto.password = hashedPassword;
     const newAgent = this.agentRepository.create(createAgentDto);
 
-    return this.agentRepository.save(newAgent);
+    this.agentRepository.save(newAgent);
+    return newAgent;
   }
 
   async findAgent(email: string): Promise<Agent> {

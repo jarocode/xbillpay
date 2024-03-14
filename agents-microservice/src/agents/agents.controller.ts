@@ -1,5 +1,5 @@
-import { Controller, BadRequestException } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Controller, BadRequestException, Inject } from '@nestjs/common';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 
 import { CreateAgentDto } from './dtos/CreateAgent.dto';
 import { AgentsService } from './agents.service';
@@ -7,11 +7,19 @@ import { SignInDto } from 'src/auth/dtos/SignIn.dto';
 
 @Controller()
 export class AgentsMicroServiceController {
-  constructor(private agentsService: AgentsService) {}
+  constructor(
+    @Inject('NATS_SERVICE') private natsClient: ClientProxy,
+    private agentsService: AgentsService,
+  ) {}
   @MessagePattern({ cmd: 'createAgent' })
   async createAgent(@Payload() data: CreateAgentDto) {
     try {
-      await this.agentsService.createAgent(data);
+      const agent = await this.agentsService.createAgent(data);
+
+      this.natsClient.emit('createWallet', {
+        agent_id: agent.id,
+        wallet_balance: 0,
+      });
 
       return {
         message: 'Agent account created successfully!',
