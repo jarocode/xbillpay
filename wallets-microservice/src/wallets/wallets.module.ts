@@ -10,4 +10,4 @@ import { WalletsService } from './wallets.service';
   controllers: [WalletsMicroServiceController],
   providers: [WalletsService],
 })
-export class AgentsModule {}
+export class WalletsModule {}
