@@ -11,6 +11,7 @@ export class WalletsService {
     @InjectRepository(Wallet) private walletRepository: Repository<Wallet>,
   ) {}
   async createWallet(createWalletDto: CreateWalletDto) {
-    console.log('walletData', createWalletDto);
+    const newWallet = this.walletRepository.create(createWalletDto);
+    await this.walletRepository.save(newWallet);
   }
 }
